@@ -1,26 +1,83 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import CommonButton from '@/components/Common/CommonButton/CommonButton.vue';
-import TaskModel from '@/components/Modals/TaskModel.vue/TaskModel.vue';
+import CommonTaskCard from '@/components/Common/CommonTaskCard/CommonTaskCard.vue';
+import { Task } from '@/models/Task';
+import { getTask, deleteTaskById } from '@/api/taskApi';
+import TaskModel from '@/components/Modals/TaskModel/TaskModel.vue';
+import NavBar from '@/components/Common/NavBar/NavBar.vue';
+
+
+
 
 
 const showModal = ref(false);
 const modalMode = ref<'Add' | 'Edit'>('Add');
+const tasks = ref<Task[]>([]);
+const selectedTask = ref<Task>();
+
+
+onMounted(() => {
+    fetchTasks();
+});
+
+
+const fetchTasks = () => {
+    getTask((response) => {
+        if (response && response?.status === 200) {
+            tasks.value = response?.data?.data;
+
+
+            console.warn(response.data)
+        } else {
+            console.error("Failed to fetch tasks:", response);
+        }
+    });
+};
+
+
+const editTask = (task: Task) => {
+    selectedTask.value = task;
+    showModal.value = true;
+    modalMode.value = 'Edit';
+
+};
+
+const deleteTask = (task: Task) => {
+    deleteTaskById(task.id, (response) => {
+        if (response && response?.status === 200) {
+            fetchTasks();
+        }
+    });
+};
 
 const openAddModal = () => {
-    showModal.value = true;
     modalMode.value = 'Add';
+    showModal.value = true;
 };
 
 const closeModal = () => {
     showModal.value = false;
+    fetchTasks();
 };
 </script>
 
 <template>
-    <div class="">
-        <CommonButton :loading="false" button-text="Add task" :onClick="openAddModal" />
-        <TaskModel :mode="modalMode" :show="showModal" :onClickClose="closeModal" />
+    <div class="container m-10">
+        <div class="sticky">
+            <NavBar />
+        </div>
+        <div class="flex justify-end mb-4 mt-9">
+            <CommonButton :loading="false" button-text="Add Task" :onClick="openAddModal" />
+        </div>
+
+        <div class="flex flex-row justify-between flex-wrap gap-3">
+            <CommonTaskCard v-for="task in tasks" :key="task.id" :task="task" @edit="editTask" @delete="deleteTask" />
+        </div>
+
+        <p v-if="tasks.length == 0" class="text-center"> No tasks available</p>
+
+        <TaskModel :mode="modalMode" :show="showModal" :onClickClose="closeModal" :task="selectedTask" />
     </div>
 </template>
 

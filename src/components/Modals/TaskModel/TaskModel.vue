@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { saveTask, updateTask } from '@/api/taskApi';
 import CommonInput from '@/components/Common/CommonInput/CommonInput.vue';
 import ModalLayout from '@/components/layouts/ModalLayout/ModalLayout.vue';
 import { Task } from '@/models/Task';
@@ -12,7 +13,9 @@ const props = defineProps<{
     onClickClose?: () => void;
 }>();
 
-const localTask = props.task ?? new Task();
+let localTask: Task = new Task();
+const taskError = ref(false);
+const loading = ref(false);
 const priority = [
     { label: 'Low', value: 'LOW' },
     { label: 'Medium', value: 'MEDIUM' },
@@ -34,7 +37,14 @@ const errors = ref<{ [key: string]: boolean }>({
 
 watch(() => props.show, (newVal) => {
     if (newVal) {
+        taskError.value = false;
+        loading.value = false;
         resetErrors();
+        if (props.mode === 'Add') {
+            localTask = new Task();
+        } else if (props.mode === 'Edit' && props.task) {
+            localTask = props.task;
+        }
     }
 });
 
@@ -68,10 +78,35 @@ const validate = () => {
 
 
 const handleSubmit = () => {
+    taskError.value = false;
     if (validate()) {
-        console.warn(localTask);
-    } else {
-        console.warn('Validation failed:', errors.value);
+        loading.value = true;
+        if (props.mode === 'Add') {
+            saveTask(localTask, (response) => {
+                if (!response && response?.status === 200) {
+                    console.log("Task saved successfully:", response?.data);
+                    taskError.value = true;
+                    loading.value = false;
+                } else {
+                    loading.value = false
+                    if (props.onClickClose) props.onClickClose();
+                }
+            }
+            )
+        } else if (props.mode === 'Edit' && props.task) {
+            updateTask(localTask.id, localTask, (response) => {
+                if (!response && response?.status === 200) {
+                    console.log("Task saved successfully:", response?.data);
+                    taskError.value = true;
+                    loading.value = false;
+                } else {
+                    loading.value = false
+                    if (props.onClickClose) props.onClickClose();
+                }
+            }
+            )
+        }
+
     }
 };
 
@@ -79,15 +114,15 @@ const handleSubmit = () => {
 
 <template>
 
-    <ModalLayout :model-show="show" :loading="false" :onClick="handleSubmit"
-        :onClickClose="onClickClose" :button-text="mode + 'Task'">
+    <ModalLayout :model-show="show" :loading="loading" :onClick="handleSubmit" :onClickClose="onClickClose"
+        :button-text="mode + 'Task'">
         <div class="flex flex-col gap-4">
             <div class="flex flex-row">
                 <h3 class="text-xl font-bold">{{ mode }} Task</h3>
             </div>
 
-            <CommonInput  type="text"  :error="errors.task_title" label="Task title" placeholder="enter the task title" name="title"
-                v-model="localTask.task_title" />
+            <CommonInput type="text" :error="errors.task_title" label="Task title" placeholder="enter the task title"
+                name="title" v-model="localTask.task_title" />
 
             <CommonInput type="text" variant="textarea" :error="errors.description" label="Task description"
                 placeholder="enter the task description" name="description" v-model="localTask.description" />
@@ -98,6 +133,9 @@ const handleSubmit = () => {
 
             <CommonInput type="text" variant="select" :options="status" :error="errors.status" label="Status"
                 placeholder="select the status" name="status" v-model="localTask.status" />
+
+
+            <p v-if="taskError" class="text-sm text-red-500 text-center">Task {{ mode }}ed failed</p>
 
 
         </div>
