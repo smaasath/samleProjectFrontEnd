@@ -6,15 +6,17 @@ import { Task } from '@/models/Task';
 import { getTask, deleteTaskById } from '@/api/taskApi';
 import TaskModel from '@/components/Modals/TaskModel/TaskModel.vue';
 import NavBar from '@/components/Common/NavBar/NavBar.vue';
+import { useTaskStore } from '@/store/task.store';
 
 
 
 
 
-const showModal = ref(false);
+const showModal = ref<boolean>(false);
 const modalMode = ref<'Add' | 'Edit'>('Add');
 const tasks = ref<Task[]>([]);
 const selectedTask = ref<Task>();
+const { setTasksAction } = useTaskStore()
 
 
 onMounted(() => {
@@ -22,13 +24,13 @@ onMounted(() => {
 });
 
 
+
 const fetchTasks = () => {
     getTask((response) => {
         if (response && response?.status === 200) {
             tasks.value = response?.data?.data;
+            setTasksAction.value(response?.data?.data)
 
-
-            console.warn(response.data)
         } else {
             console.error("Failed to fetch tasks:", response);
         }
@@ -71,7 +73,7 @@ const closeModal = () => {
             <CommonButton :loading="false" button-text="Add Task" :onClick="openAddModal" />
         </div>
 
-        <div class="flex flex-row justify-between flex-wrap gap-3">
+        <div class="flex flex-row flex-wrap gap-6">
             <CommonTaskCard v-for="task in tasks" :key="task.id" :task="task" @edit="editTask" @delete="deleteTask" />
         </div>
 

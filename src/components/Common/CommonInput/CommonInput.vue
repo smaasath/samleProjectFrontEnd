@@ -10,7 +10,7 @@ const props = defineProps<{
     name: string;
     modelValue: string;
     variant?: 'input' | 'select' | 'textarea';
-    options?: Array<{ label: string; value: string }>; // Only used if variant is 'select'
+    options?: Array<{ label: string; value: string }>;
 }>();
 
 const emit = defineEmits<{

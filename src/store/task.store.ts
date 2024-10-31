@@ -1,14 +1,13 @@
 import { Task } from "@/models/Task";
-import { create } from "zustand";
+import create from 'vue-zustand';
 
 type State = {
-    tasks: Array<Task>;
+    tasks: Task[];
 };
 
 type Action = {
-    setTasksAction: (tasks: Array<Task>) => void;
+    setTasksAction: (tasks: Task[]) => void;
 };
-
 
 const initialState: State = {
     tasks: [],
@@ -17,8 +16,5 @@ const initialState: State = {
 
 export const useTaskStore = create<State & Action>((set) => ({
     ...initialState,
-    setTasksAction: (newTasks: Array<Task>) =>
-        set((state) => ({
-            tasks: [...state.tasks, ...newTasks],
-        })),
+    setTasksAction: (newTasks: Task[]) => set({ tasks: newTasks }), 
 }));

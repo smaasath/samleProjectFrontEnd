@@ -9,7 +9,7 @@ const props = defineProps<{
     onDelete: (task: Task) => void;
 }>();
 
-// Emit events for edit and delete actions
+
 const emit = defineEmits(['edit', 'delete']);
 
 const handleEdit = () => {

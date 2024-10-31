@@ -16,7 +16,7 @@ class HttpInterceptor {
 
         this.instance.interceptors.request.use(
             async (request: InternalAxiosRequestConfig) => {
-                // You can modify the request here if needed
+             
                 return request;
             },
         );
@@ -36,7 +36,7 @@ class HttpInterceptor {
                         case 401:
                             console.error('[ERROR]', '[HTTP Interceptor, Unauthorized]');
                             break;
-                        // You can add more cases for other status codes if needed
+                    
                         default:
                             console.error('[ERROR]', '[HTTP Interceptor, Other Status Code]', status);
                             break;
