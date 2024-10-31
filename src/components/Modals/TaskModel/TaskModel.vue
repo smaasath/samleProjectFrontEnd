@@ -11,6 +11,7 @@ const props = defineProps<{
     task?: Task;
     show: boolean;
     onClickClose?: () => void;
+    reload?: () => void;
 }>();
 
 let localTask: Task = new Task();
@@ -43,7 +44,7 @@ watch(() => props.show, (newVal) => {
         if (props.mode === 'Add') {
             localTask = new Task();
         } else if (props.mode === 'Edit' && props.task) {
-            localTask = props.task;
+            localTask = {...props.task};
         }
     }
 });
@@ -90,6 +91,7 @@ const handleSubmit = () => {
                 } else {
                     loading.value = false
                     if (props.onClickClose) props.onClickClose();
+                    if (props.reload) props.reload();
                 }
             }
             )
@@ -102,6 +104,7 @@ const handleSubmit = () => {
                 } else {
                     loading.value = false
                     if (props.onClickClose) props.onClickClose();
+                    if (props.reload) props.reload();
                 }
             }
             )

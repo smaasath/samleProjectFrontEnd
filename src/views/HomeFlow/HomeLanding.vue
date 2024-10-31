@@ -68,7 +68,6 @@ const openAddModal = () => {
 
 const closeModal = () => {
     showModal.value = false;
-    fetchTasks();
 };
 </script>
 
@@ -92,7 +91,7 @@ const closeModal = () => {
 
         <p v-if="taskGetError" class="text-red-600 text-center"> Something went wrong try again!</p>
 
-        <TaskModel :mode="modalMode" :show="showModal" :onClickClose="closeModal" :task="selectedTask" />
+        <TaskModel :mode="modalMode" :show="showModal" :onClickClose="closeModal" :task="selectedTask" :reload="fetchTasks" />
     </div>
 </template>
 
