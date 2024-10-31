@@ -44,7 +44,7 @@ watch(() => props.show, (newVal) => {
         if (props.mode === 'Add') {
             localTask = new Task();
         } else if (props.mode === 'Edit' && props.task) {
-            localTask = {...props.task};
+            localTask = { ...props.task };
         }
     }
 });
@@ -84,28 +84,12 @@ const handleSubmit = () => {
         loading.value = true;
         if (props.mode === 'Add') {
             saveTask(localTask, (response) => {
-                if (!response && response?.status === 200) {
-                    console.log("Task saved successfully:", response?.data);
-                    taskError.value = true;
-                    loading.value = false;
-                } else {
-                    loading.value = false
-                    if (props.onClickClose) props.onClickClose();
-                    if (props.reload) props.reload();
-                }
+                handleResponce(response);
             }
             )
         } else if (props.mode === 'Edit' && props.task) {
             updateTask(localTask.id, localTask, (response) => {
-                if (!response && response?.status === 200) {
-                    console.log("Task saved successfully:", response?.data);
-                    taskError.value = true;
-                    loading.value = false;
-                } else {
-                    loading.value = false
-                    if (props.onClickClose) props.onClickClose();
-                    if (props.reload) props.reload();
-                }
+                handleResponce(response);
             }
             )
         }
@@ -113,6 +97,18 @@ const handleSubmit = () => {
     }
 };
 
+
+const handleResponce = (response: any) => {
+    if (!response && response?.status === 200) {
+        console.log("Task saved successfully:", response?.data);
+        taskError.value = true;
+        loading.value = false;
+    } else {
+        loading.value = false
+        if (props.onClickClose) props.onClickClose();
+        if (props.reload) props.reload();
+    }
+}
 </script>
 
 <template>
