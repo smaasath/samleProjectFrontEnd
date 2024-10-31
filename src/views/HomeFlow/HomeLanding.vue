@@ -7,12 +7,15 @@ import { getTask, deleteTaskById } from '@/api/taskApi';
 import TaskModel from '@/components/Modals/TaskModel/TaskModel.vue';
 import NavBar from '@/components/Common/NavBar/NavBar.vue';
 import { useTaskStore } from '@/store/task.store';
+import CommonLoader from '@/components/Common/CommonLoader/CommonLoader.vue';
 
 
 
 
 
 const showModal = ref<boolean>(false);
+const loader = ref<boolean>(false);
+const taskGetError = ref<boolean>(false);
 const modalMode = ref<'Add' | 'Edit'>('Add');
 const tasks = ref<Task[]>([]);
 const selectedTask = ref<Task>();
@@ -26,13 +29,18 @@ onMounted(() => {
 
 
 const fetchTasks = () => {
+    taskGetError.value = false;
+    loader.value = true;
     getTask((response) => {
         if (response && response?.status === 200) {
             tasks.value = response?.data?.data;
-            setTasksAction.value(response?.data?.data)
+            setTasksAction.value(response?.data?.data);
+            loader.value = false;
 
         } else {
             console.error("Failed to fetch tasks:", response);
+            taskGetError.value = true;
+            loader.value = false;
         }
     });
 };
@@ -65,7 +73,10 @@ const closeModal = () => {
 </script>
 
 <template>
-    <div class="container m-10">
+    <div v-if="loader" class="flex items-center justify-center h-screen w-screen">
+        <CommonLoader />
+    </div>
+    <div v-if="!loader" class="container m-10">
         <div class="sticky">
             <NavBar />
         </div>
@@ -78,6 +89,8 @@ const closeModal = () => {
         </div>
 
         <p v-if="tasks.length == 0" class="text-center"> No tasks available</p>
+
+        <p v-if="taskGetError" class="text-red-600 text-center"> Something went wrong try again!</p>
 
         <TaskModel :mode="modalMode" :show="showModal" :onClickClose="closeModal" :task="selectedTask" />
     </div>
