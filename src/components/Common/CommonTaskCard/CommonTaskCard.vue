@@ -44,9 +44,9 @@ const handleDelete = () => {
         </div>
 
         <a href="#">
-            <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">{{ task.task_title }}</h5>
+            <h5 class="mb-2 text-2xl font-semibold text-wrap tracking-tight text-gray-900 dark:text-white">{{ task.task_title }}</h5>
         </a>
-        <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">{{ task.description }}</p>
+        <p class="mb-3 font-normal text-gray-500 text-wrap dark:text-gray-400">{{ task.description }}</p>
 
         <div class="flex flex-row gap-2 w-96">
             <CommonStatusContainer :priority="task.priority" />
